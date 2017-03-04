@@ -1,4 +1,4 @@
-# Mainflux CoAP
+# Mainflux InfluxDB Service
 
 [![License](https://img.shields.io/badge/license-Apache%20v2.0-blue.svg)](LICENSE)
 [![Build Status](https://travis-ci.org/mainflux/mainflux-cli.svg?branch=master)](https://travis-ci.org/mainflux/mainflux-cli)
