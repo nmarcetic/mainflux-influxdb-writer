@@ -21,19 +21,19 @@ export PATH=$PATH:$GOBIN
 ```
 
 #### Get the code
-Use [`go`](https://golang.org/cmd/go/) tool to "get" (i.e. fetch and build) `mainflux-influxdb` package:
+Use [`go`](https://golang.org/cmd/go/) tool to "get" (i.e. fetch and build) `mainflux-influxdb-writer` package:
 ```bash
-go get github.com/mainflux/mainflux-influxdb
+go get github.com/mainflux/mainflux-influxdb-writer
 ```
 
-This will download the code to `$GOPATH/src/github.com/mainflux/mainflux-influxdb` directory,
+This will download the code to `$GOPATH/src/github.com/mainflux/mainflux-influxdb-writer` directory,
 and then compile it and install the binary in `$GOBIN` directory.
 
 Now you can run the program with:
 ```
-mainflux-influxdb
+mainflux-influxdb-writer
 ```
-if `$GOBIN` is in `$PATH` (otherwise use `$GOBIN/mainflux-influxdb`)
+if `$GOBIN` is in `$PATH` (otherwise use `$GOBIN/mainflux-influxdb-writer`)
 
 ### Documentation
 Development documentation can be found [here](http://mainflux.io/).
