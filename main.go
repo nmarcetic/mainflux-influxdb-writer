@@ -30,9 +30,17 @@ Options:
 
 type (
 	Opts struct {
+		InfluxHost      string
+		InfluxPort      string
+		InfluxDatabase  string
+		InfluxUser      string
+		InfluxPass      string
+		InfluxPrecision string
+
 		NatsHost string
 		NatsPort string
-		Help     bool
+
+		Help bool
 	}
 
 	NatsMsg struct {
@@ -59,14 +67,21 @@ func influxdbHandler(nm *nats.Msg) {
 	}
 
 	println("Calling writeMessage()")
+	writeMessage(m)
 	fmt.Println(m.Publisher, m.Protocol, m.Channel, m.Payload)
 }
 
 func main() {
 	opts := Opts{}
 
-	flag.StringVar(&opts.NatsHost, "a", "nats", "NATS broker address.")
-	flag.StringVar(&opts.NatsPort, "p", "4222", "NATS broker port.")
+	flag.StringVar(&opts.InfluxHost, "i", "localhost", "InfluxDB host.")
+	flag.StringVar(&opts.InfluxPort, "q", "8086", "InfluxDB port.")
+	flag.StringVar(&opts.InfluxDatabase, "d", "mainflux", "InfluxDB databse name.")
+	flag.StringVar(&opts.InfluxUser, "u", "mainflux", "InfluxDB username.")
+	flag.StringVar(&opts.InfluxPass, "s", "", "InfluxDB password.")
+	flag.StringVar(&opts.InfluxPrecision, "p", "s", "InfluxDB time precision.")
+	flag.StringVar(&opts.NatsHost, "n", "localhost", "NATS broker address.")
+	flag.StringVar(&opts.NatsPort, "m", "4222", "NATS broker port.")
 	flag.BoolVar(&opts.Help, "h", false, "Show help.")
 	flag.BoolVar(&opts.Help, "help", false, "Show help.")
 
@@ -77,6 +92,17 @@ func main() {
 		os.Exit(0)
 	}
 
+	// Connect to InfluxDB
+	if err := InfluxInit(opts.InfluxHost, opts.InfluxPort, opts.InfluxDatabase,
+		opts.InfluxUser, opts.InfluxPass, opts.InfluxPrecision); err != nil {
+
+		log.Fatalf("InfluxDB: Can't connect: %v\n", err)
+	}
+
+	if _, err := InfluxQueryDB(fmt.Sprintf("CREATE DATABASE %s", opts.InfluxDatabase)); err != nil {
+		log.Fatal(err)
+	}
+
 	// Connect to NATS broker
 	var err error
 	NatsConn, err = nats.Connect("nats://" + opts.NatsHost + ":" + opts.NatsPort)
@@ -84,11 +110,11 @@ func main() {
 		log.Fatalf("NATS: Can't connect: %v\n", err)
 	}
 
+	// Subscribe to NATS
+	NatsConn.Subscribe("mainflux/http/msg", influxdbHandler)
+
 	// Print banner
 	color.Cyan(banner)
-
-	// Subscribe to NATS
-	NatsConn.Subscribe("mainflux/core/out", influxdbHandler)
 
 	// Prevent program to exit
 	runtime.Goexit()

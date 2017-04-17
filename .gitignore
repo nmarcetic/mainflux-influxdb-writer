@@ -21,4 +21,4 @@ Session.vim
 tags
 
 # Binary
-mainflux-influxdb
+mainflux-influxdb-writer
