@@ -111,7 +111,7 @@ func main() {
 	}
 
 	// Subscribe to NATS
-	NatsConn.Subscribe("mainflux/http/msg", influxdbHandler)
+	NatsConn.Subscribe("msg.*", influxdbHandler)
 
 	// Print banner
 	color.Cyan(banner)

@@ -9,15 +9,35 @@
 package main
 
 import (
-	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
+	"reflect"
 	"time"
 
 	"github.com/cisco/senml"
 	ic "github.com/influxdata/influxdb/client/v2"
-	"github.com/mainflux/mainflux-influxdb-writer/models"
 )
+
+func inArray(val interface{}, array interface{}) (exists bool, index int) {
+	exists = false
+	index = -1
+
+	switch reflect.TypeOf(array).Kind() {
+	case reflect.Slice:
+		s := reflect.ValueOf(array)
+
+		for i := 0; i < s.Len(); i++ {
+			if reflect.DeepEqual(val, s.Index(i).Interface()) == true {
+				index = i
+				exists = true
+				return
+			}
+		}
+	}
+
+	return
+}
 
 // writeMessage function
 // Writtes message into DB.
@@ -32,6 +52,11 @@ func writeMessage(nm NatsMsg) error {
 
 	// Normalize (i.e. resolve) SenMLRecord
 	sn := senml.Normalize(s)
+	if len(sn.Records) == 0 {
+		err := errors.New("ERROR: Wrong SenML")
+		log.Print(err)
+		return err
+	}
 
 	// Timestamp
 	t := time.Now().UTC().Format(time.RFC3339)
@@ -44,40 +69,45 @@ func writeMessage(nm NatsMsg) error {
 
 	for _, r := range sn.Records {
 
-		m := models.Message{}
+		// InfluxDB tags
+		tags := map[string]string{"name": r.Name}
 
-		// Copy SenMLRecord struct to Message struct
-		b, err := json.Marshal(r)
+		// InfluxDB fields
+		fields := make(map[string]interface{})
+
+		if len(r.Unit) != 0 {
+			fields["unit"] = r.Unit
+		}
+		if r.UpdateTime != 0 {
+			fields["update_time"] = r.UpdateTime
+		}
+		if r.Value != nil {
+			fields["value"] = *(r.Value)
+		}
+		if len(r.StringValue) != 0 {
+			fields["string_value"] = r.StringValue
+		}
+		if len(r.DataValue) != 0 {
+			fields["data_value"] = r.DataValue
+		}
+		if r.BoolValue != nil {
+			fields["bool_value"] = *(r.BoolValue)
+		}
+		if r.Sum != nil {
+			fields["sum"] = *(r.Sum)
+		}
+
+		fields["channel"] = nm.Channel
+		fields["publisher"] = nm.Publisher
+		fields["protocol"] = nm.Protocol
+		fields["timestamp"] = t
+
+		pt, err := ic.NewPoint(nm.Channel, tags, fields, time.Unix(int64(r.Time), 0))
 		if err != nil {
 			log.Print(err)
 			return err
 		}
-		if err := json.Unmarshal(b, &m); err != nil {
-			log.Print(err)
-			return err
-		}
-
-		// Fill-in Mainflux stuff
-		m.Channel = nm.Channel
-		m.Publisher = nm.Publisher
-		m.Protocol = nm.Protocol
-		m.Timestamp = t
-
-		// Create an InfluxDB point and add to batch
-		if m.Value != nil {
-			tags := map[string]string{"name": m.Name}
-
-			fields := map[string]interface{}{
-				"value": *(m.Value),
-			}
-
-			pt, err := ic.NewPoint(nm.Channel, tags, fields, time.Unix(int64(m.Time), 0))
-			if err != nil {
-				log.Print(err)
-				return err
-			}
-			bp.AddPoint(pt)
-		}
+		bp.AddPoint(pt)
 	}
 
 	// Write the batch
