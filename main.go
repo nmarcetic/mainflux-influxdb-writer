@@ -23,9 +23,16 @@ const (
 	help string = `
 Usage: mainflux-influxdb [options]
 Options:
-	-a, --host	Host address
-	-p, --port	Port
-	-h, --help	Prints this message end exits`
+	-i, --ihost	InfluxDB host
+	-q, --iport	InfluxDB port
+	-s, --db	InfluxDB database
+	-u, --user	InfluxDB username
+	-p, --pass	InfluxDB password
+	-p, --precision	InfluxDB time precision
+	-n, --nhost	NATS host
+	-m, --nport	NATS port
+	-h, --help	Show help
+`
 )
 
 type (
