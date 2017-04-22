@@ -1,0 +1,11 @@
+package: github.com/mainflux/mainflux-influxdb-writer
+import:
+- package: github.com/cisco/senml
+- package: github.com/fatih/color
+  version: ^1.4.1
+- package: github.com/influxdata/influxdb
+  version: ^1.2.3
+  subpackages:
+  - client/v2
+- package: github.com/nats-io/go-nats
+  version: ^1.2.2

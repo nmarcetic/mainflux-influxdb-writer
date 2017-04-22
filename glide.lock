@@ -1,0 +1,38 @@
+hash: 4289be6b29ae83a52d5503a2b80546d825e2a2609deb1635a31c02f0175233fd
+updated: 2017-04-22T23:20:16.704888077+02:00
+imports:
+- name: github.com/cisco/senml
+  version: 157479c25a2fcba03d0eb9d5bb237a079e4a07cb
+- name: github.com/fatih/color
+  version: 9131ab34cf20d2f6d83fdc67168a5430d1c7dc23
+- name: github.com/influxdata/influxdb
+  version: 74aa2aa9ae830cd11b8e975e85bb60e61d8d1f21
+  subpackages:
+  - client/v2
+  - models
+  - pkg/escape
+- name: github.com/mattn/go-colorable
+  version: 5411d3eea5978e6cdc258b30de592b60df6aba96
+  repo: https://github.com/mattn/go-colorable
+- name: github.com/mattn/go-isatty
+  version: 57fdcb988a5c543893cc61bce354a6e24ab70022
+  repo: https://github.com/mattn/go-isatty
+- name: github.com/nats-io/go-nats
+  version: 61923ed1eaf8398000991fbbee2ef11ab5a5be0d
+- name: github.com/nats-io/nats
+  version: 9c2ce0b1f855da8981394f9fb2ccca2bbf55e798
+  subpackages:
+  - encoders/builtin
+  - util
+- name: github.com/nats-io/nuid
+  version: 3cf34f9fca4e88afa9da8eabd75e3326c9941b44
+- name: github.com/ugorji/go
+  version: 708a42d246822952f38190a8d8c4e6b16a0e600c
+  subpackages:
+  - codec
+- name: golang.org/x/sys
+  version: e24f485414aeafb646f6fca458b0bf869c0880a1
+  repo: https://go.googlesource.com/sys
+  subpackages:
+  - unix
+testImports: []
