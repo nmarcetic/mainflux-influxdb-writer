@@ -100,7 +100,7 @@ func writeMessage(nm NatsMsg) error {
 		fields["channel"] = nm.Channel
 		fields["publisher"] = nm.Publisher
 		fields["protocol"] = nm.Protocol
-		fields["timestamp"] = t
+		fields["created"] = t
 
 		pt, err := ic.NewPoint(nm.Channel, tags, fields, time.Unix(int64(r.Time), 0))
 		if err != nil {
