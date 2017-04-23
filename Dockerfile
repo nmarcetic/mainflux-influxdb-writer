@@ -21,5 +21,5 @@ RUN cd /go/src/github.com/mainflux/mainflux-influxdb-writer && go install
 ###
 # Run main command with dockerize
 ###
-CMD mainflux-influxdb-writer -i INFLUX_HOST -n NATS_HOST
+CMD mainflux-influxdb-writer -i $INFLUX_HOST -n $NATS_HOST
 
