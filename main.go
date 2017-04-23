@@ -12,11 +12,13 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/fatih/color"
-	"github.com/nats-io/go-nats"
 	"log"
 	"os"
 	"runtime"
+
+	"github.com/cenkalti/backoff"
+	"github.com/fatih/color"
+	"github.com/nats-io/go-nats"
 )
 
 const (
@@ -60,7 +62,33 @@ type (
 
 var (
 	NatsConn *nats.Conn
+	opts     Opts
 )
+
+func tryInfluxInit() error {
+	var err error
+
+	log.Print("Connecting to InfluxDB... ")
+	if err = InfluxInit(opts.InfluxHost, opts.InfluxPort, opts.InfluxDatabase,
+		opts.InfluxUser, opts.InfluxPass, opts.InfluxPrecision); err != nil {
+		log.Println(err)
+		return err
+	}
+
+	if _, err = InfluxQueryDB(fmt.Sprintf("CREATE DATABASE %s", opts.InfluxDatabase)); err != nil {
+		log.Println(err)
+	}
+
+	return err
+}
+
+func tryNatsConnect() error {
+	var err error
+
+	log.Print("Connecting to NATS... ")
+	NatsConn, err = nats.Connect("nats://" + opts.NatsHost + ":" + opts.NatsPort)
+	return err
+}
 
 func influxdbHandler(nm *nats.Msg) {
 	fmt.Printf("Received a message: %s\n", string(nm.Data))
@@ -79,7 +107,6 @@ func influxdbHandler(nm *nats.Msg) {
 }
 
 func main() {
-	opts := Opts{}
 
 	flag.StringVar(&opts.InfluxHost, "i", "localhost", "InfluxDB host.")
 	flag.StringVar(&opts.InfluxPort, "q", "8086", "InfluxDB port.")
@@ -100,21 +127,20 @@ func main() {
 	}
 
 	// Connect to InfluxDB
-	if err := InfluxInit(opts.InfluxHost, opts.InfluxPort, opts.InfluxDatabase,
-		opts.InfluxUser, opts.InfluxPass, opts.InfluxPrecision); err != nil {
-
+	if err := backoff.Retry(tryInfluxInit, backoff.NewExponentialBackOff()); err != nil {
 		log.Fatalf("InfluxDB: Can't connect: %v\n", err)
+	} else {
+		log.Println("OK")
 	}
 
-	if _, err := InfluxQueryDB(fmt.Sprintf("CREATE DATABASE %s", opts.InfluxDatabase)); err != nil {
-		log.Fatal(err)
-	}
+	/*
 
+	 */
 	// Connect to NATS broker
-	var err error
-	NatsConn, err = nats.Connect("nats://" + opts.NatsHost + ":" + opts.NatsPort)
-	if err != nil {
+	if err := backoff.Retry(tryNatsConnect, backoff.NewExponentialBackOff()); err != nil {
 		log.Fatalf("NATS: Can't connect: %v\n", err)
+	} else {
+		log.Println("OK")
 	}
 
 	// Subscribe to NATS

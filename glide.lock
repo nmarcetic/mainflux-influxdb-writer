@@ -1,6 +1,8 @@
-hash: 4289be6b29ae83a52d5503a2b80546d825e2a2609deb1635a31c02f0175233fd
-updated: 2017-04-22T23:20:16.704888077+02:00
+hash: 40861475fe83d73608ad46b3dc8ddab04c9df9b6dc2f7d3467bfea061d35b0c5
+updated: 2017-04-23T23:21:30.828030174+02:00
 imports:
+- name: github.com/cenkalti/backoff
+  version: 32cd0c5b3aef12c76ed64aaf678f6c79736be7dc
 - name: github.com/cisco/senml
   version: 157479c25a2fcba03d0eb9d5bb237a079e4a07cb
 - name: github.com/fatih/color
