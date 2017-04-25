@@ -133,9 +133,6 @@ func main() {
 		log.Println("OK")
 	}
 
-	/*
-
-	 */
 	// Connect to NATS broker
 	if err := backoff.Retry(tryNatsConnect, backoff.NewExponentialBackOff()); err != nil {
 		log.Fatalf("NATS: Can't connect: %v\n", err)
