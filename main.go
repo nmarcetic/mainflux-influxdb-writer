@@ -53,10 +53,11 @@ type (
 	}
 
 	NatsMsg struct {
-		Channel   string `json:"channel"`
-		Publisher string `json:"publisher"`
-		Protocol  string `json:"protocol"`
-		Payload   []byte `json:"payload"`
+		Channel     string `json:"channel"`
+		Publisher   string `json:"publisher"`
+		Protocol    string `json:"protocol"`
+		Payload     []byte `json:"payload"`
+		ContentType string `json:"content_type"`
 	}
 )
 
@@ -101,7 +102,6 @@ func influxdbHandler(nm *nats.Msg) {
 		}
 	}
 
-	println("Calling writeMessage()")
 	writeMessage(m)
 	fmt.Println(m.Publisher, m.Protocol, m.Channel, m.Payload)
 }
@@ -151,12 +151,12 @@ func main() {
 }
 
 var banner = `
-╔╦╗┌─┐┬┌┐┌┌─┐┬  ┬ ┬─┐ ┬  ╦┌┐┌┌─┐┬  ┬ ┬─┐ ┬╔╦╗╔╗ 
+╔╦╗┌─┐┬┌┐┌┌─┐┬  ┬ ┬─┐ ┬  ╦┌┐┌┌─┐┬  ┬ ┬─┐ ┬╔╦╗╔╗
 ║║║├─┤││││├┤ │  │ │┌┴┬┘  ║│││├┤ │  │ │┌┴┬┘ ║║╠╩╗
 ╩ ╩┴ ┴┴┘└┘└  ┴─┘└─┘┴ └─  ╩┘└┘└  ┴─┘└─┘┴ └─═╩╝╚═╝
 
           == Industrial IoT System ==
-       
+
          Made with <3 by Mainflux Team
 [w] http://mainflux.io
 [t] @mainflux
