@@ -18,23 +18,16 @@ import (
 	ic "github.com/influxdata/influxdb/client/v2"
 )
 
-const (
-	senMl string = "senml+json"
-	blob  string = "octet-stream"
-)
-
 // writeMessage function
 // Writtes message into DB.
 func writeMessage(nm NatsMsg) error {
 
 	var s senml.SenML
 	var err error
-	// If msg is senMl, validate it
-	if nm.ContentType == senMl {
-		if s, err = senml.Decode(nm.Payload, senml.JSON); err != nil {
-			println("ERROR")
-			return err
-		}
+
+	if s, err = senml.Decode(nm.Payload, senml.JSON); err != nil {
+		println("ERROR")
+		return err
 	}
 
 	// Normalize (i.e. resolve) SenMLRecord

@@ -66,6 +66,11 @@ var (
 	opts     Opts
 )
 
+const (
+	senMl string = "senml+json"
+	blob  string = "octet-stream"
+)
+
 func tryInfluxInit() error {
 	var err error
 
@@ -101,8 +106,10 @@ func influxdbHandler(nm *nats.Msg) {
 			return
 		}
 	}
-
-	writeMessage(m)
+	// If msg is senMl, write in DB
+	if m.ContentType == senMl {
+		writeMessage(m)
+	}
 	fmt.Println(m.Publisher, m.Protocol, m.Channel, m.Payload)
 }
 
