@@ -57,7 +57,10 @@ func writeMessage(nm NatsMsg) error {
 	for _, r := range sn.Records {
 
 		// InfluxDB tags
-		tags := map[string]string{"name": r.Name}
+		tags := map[string]string{
+			"name":         r.Name,
+			"content_type": nm.ContentType,
+		}
 
 		// InfluxDB fields
 		fields := make(map[string]interface{})
